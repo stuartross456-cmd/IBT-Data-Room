@@ -86,5 +86,5 @@ def ask_gemini():
 
 # 6. Server Initialization
 if __name__ == '__main__':
-app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
 # Triggering live build
