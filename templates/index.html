@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IBT Data Room</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 40px; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { border-bottom: 2px solid #555; padding-bottom: 10px; }
+        .module { background-color: #1e1e1e; padding: 20px; margin-top: 20px; border-radius: 8px; }
+        a { color: #00bcd4; text-decoration: none; font-weight: bold; display: block; margin-top: 8px;}
+        a:hover { text-decoration: underline; color: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Infinite Box Theory (IBT)</h1>
+        <p><strong>Architectural Data Room v1.0</strong></p>
+        <p>Open-source repository for hydrodynamic blueprints, metric expansion models, and mathematical proofs.</p>
+
+        <!-- AI INTERFACE MODULE -->
+        <div class="module" style="border: 1px solid #00bcd4;">
+            <h2>IBT Neural Assistant (Gemini)</h2>
+            <p>Query the framework or analyze universal mechanics.</p>
+            <textarea id="ai-input" rows="3" style="width: 100%; box-sizing: border-box; background: #2d2d2d; color: white; border: 1px solid #555; border-radius: 4px; padding: 10px; font-family: inherit;" placeholder="Initialize query..."></textarea>
+            <button onclick="askAI()" style="margin-top: 10px; padding: 10px 15px; background: #00bcd4; color: #121212; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">Execute Query</button>
+            <div id="ai-response" style="margin-top: 15px; padding: 15px; background: #121212; border-left: 3px solid #00bcd4; display: none; line-height: 1.5;"></div>
+        </div>
+
+        <div class="module">
+            <h2>Applied Fluid Dynamics & Metric Expansion</h2>
+            <p>Hydrodynamic Topography and structural fluid dynamics models.</p>
+            <a href="/static/IBT Chaos and Order.pdf" target="_blank">[ View: Chaos and Order ]</a>
+            <a href="/static/Hydrodynamic_Topography_Master_V5.pdf" target="_blank">[ View: Hydrodynamic Topography Master V5 ]</a>
+            <a href="/static/Hydrodynamic part 2.pdf" target="_blank">[ View: Hydrodynamic Part 2 ]</a>
+            <a href="/static/Hydrodynamic_Resolution_to_Quantum_NonLocality.pdf" target="_blank">[ View: Resolution to Quantum NonLocality ]</a>
+        </div>
+
+        <div class="module">
+            <h2>Theoretical Mathematics & Quantum Mechanics</h2>
+            <p>Proofs by Modular Invariance, Substrate Mechanics, and Quantum Processing.</p>
+            <a href="/static/IBT and Riemann Hypothesis (1).pdf" target="_blank">[ View: Riemann Hypothesis Proof ]</a>
+            <a href="/static/IBT quantum processor.pdf" target="_blank">[ View: Quantum Processor ]</a>
+            <a href="/static/Proton_and_Quirks.pdf" target="_blank">[ View: Proton and Quirks ]</a>
+            <a href="/static/Acoustic_Cryptography_Quantum_Substrate.pdf" target="_blank">[ View: Acoustic Cryptography Substrate ]</a>
+        </div>
+
+        <div class="module">
+            <h2>Philosophical & Codified Law</h2>
+            <p>Analysis of consciousness, deterministic mechanics, and codified universal laws.</p>
+            <a href="/static/Physics_of_Free_Will_Full_Unabridged.pdf" target="_blank">[ View: Physics of Free Will ]</a>
+            <a href="/static/Codified_Law_I_Expanded.pdf" target="_blank">[ View: Codified Law I ]</a>
+            <a href="/static/law_ii.pdf" target="_blank">[ View: Law II ]</a>
+        </div>
+
+        <div class="module">
+            <h2>Archived Frameworks & Data</h2>
+            <p>Version history, assignments, and supplementary datasets.</p>
+            <a href="/static/IBT v13.pdf" target="_blank">[ View: IBT v13 ]</a>
+            <a href="/static/Assginment.pdf" target="_blank">[ View: Assignment ]</a>
+            <a href="/static/NED30.5.1-D-17.1.2-20200415.xlsx" target="_blank">[ Download: NED30.5.1 Data (.xlsx) ]</a>
+        </div>
+
+    </div>
+
+    <!-- AI COMMUNICATION SCRIPT -->
+    <script>
+        async function askAI() {
+            const input = document.getElementById('ai-input').value;
+            const responseDiv = document.getElementById('ai-response');
+            
+            if (!input) return;
+            
+            // Show loading state
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = '<em style="color: #888;">Processing neural query...</em>';
+            
+            try {
+                // Send the data to your Python server
+                const response = await fetch('/ask_gemini', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: input })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    responseDiv.innerHTML = '<span style="color: #ff5252;">System Error: ' + data.error + '</span>';
+                } else {
+                    // Format the text and display the AI's answer
+                    responseDiv.innerHTML = data.response.replace(/\n/g, '<br>');
+                }
+            } catch (error) {
+                responseDiv.innerHTML = '<span style="color: #ff5252;">Connection failed. Verify server is running.</span>';
+            }
+        }
+    </script>
+
+</body>
+</html>
