@@ -122,35 +122,65 @@
             
             if (!window.latestAiResponse) return;
             
-            btn.innerText = "⏳ Generating audio stream...";
+            btn.innerText = "⏳ Processing audio chunks...";
             btn.disabled = true;
 
-            try {
-                // Send the clean text to your Python Speechify route
-                const res = await fetch('/read_aloud', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: window.latestAiResponse })
-                });
+            // 1. Safely chop the massive text into smaller pieces (by sentences)
+            const sentences = window.latestAiResponse.match(/[^.!?]+[.!?]+/g) || [window.latestAiResponse];
+            let chunks = [];
+            let currentChunk = "";
 
-                if (!res.ok) throw new Error("Audio generation failed");
-
-                // Convert the raw data into a playable audio file
-                const blob = await res.blob();
-                player.src = URL.createObjectURL(blob);
-                player.style.display = "block";
-                
-                // Set playback speed to 25% faster for optimal efficiency
-                player.playbackRate = 1.25; 
-                await player.play();
-                
-                btn.innerText = "🔊 Playing Audio...";
-            } catch (error) {
-                console.error(error);
-                btn.innerText = "❌ Playback Error";
-            } finally {
-                btn.disabled = false;
+            for (let sentence of sentences) {
+                if (currentChunk.length + sentence.length < 1800) {
+                    currentChunk += sentence;
+                } else {
+                    chunks.push(currentChunk);
+                    currentChunk = sentence;
+                }
             }
+            if (currentChunk) chunks.push(currentChunk);
+
+            // 2. Create the Playlist loop
+            async function playNextChunk(index) {
+                if (index >= chunks.length) {
+                    btn.innerText = "🔊 Read Answer Aloud";
+                    btn.disabled = false;
+                    return;
+                }
+
+                btn.innerText = `🔊 Playing Part ${index + 1} of ${chunks.length}...`;
+
+                try {
+                    const res = await fetch('/read_aloud', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: chunks[index] })
+                    });
+
+                    if (!res.ok) throw new Error("Audio generation failed");
+
+                    const blob = await res.blob();
+                    player.src = URL.createObjectURL(blob);
+                    player.style.display = "block";
+                    
+                    // Maintain the crisp 1.25x speed for maximum efficiency
+                    player.playbackRate = 1.25; 
+
+                    // 3. When this chunk finishes, automatically fetch and play the next one
+                    player.onended = () => {
+                        playNextChunk(index + 1);
+                    };
+
+                    await player.play();
+                } catch (error) {
+                    console.error(error);
+                    btn.innerText = "❌ Playback Error";
+                    btn.disabled = false;
+                }
+            }
+
+            // Start the playlist at chunk 0
+            playNextChunk(0);
         }
     </script>
 </body>
