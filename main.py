@@ -1,9 +1,10 @@
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, Response
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 from speechify import Speechify
+
 # 1. Unlock the secure vault and load environment variables
 load_dotenv()
 
@@ -13,6 +14,7 @@ client = genai.Client()
 speechify_client = Speechify(
     token=os.environ.get("SPEECHIFY_API_KEY")
 )
+
 # 3. Define the Infinite Box Theory System Persona
 ibt_instructions = """
 You are the Infinite Box Theory (IBT) Neural Assistant. 
@@ -44,7 +46,6 @@ ibt_cache = client.caches.create(
 print(f"Vault cached successfully! Ready for rapid queries.")
 # ---------------------------------------------------------
 
-
 def generate_audio(text_content):
     response = speechify_client.audio.speech(
         audio_format="mp3",
@@ -53,6 +54,7 @@ def generate_audio(text_content):
         voice_id="george"
     )
     return response
+
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -95,6 +97,23 @@ def ask_gemini():
             return jsonify({'response': fallback_response.text})
         except Exception as fallback_e:
             return jsonify({'error': str(fallback_e)}), 500
+
+# ---------------------------------------------------------
+# NEW ROUTE: Text-to-Speech Audio Streamer
+# ---------------------------------------------------------
+@app.route('/read_aloud', methods=['POST'])
+def read_aloud():
+    data = request.json
+    text_content = data.get('text')
+    
+    if not text_content:
+        return jsonify({'error': 'No text provided'}), 400
+        
+    # Generate the audio using Speechify
+    audio_res = generate_audio(text_content)
+    
+    # Stream the raw audio data directly back to the browser player
+    return Response(audio_res.audio_data, mimetype="audio/mpeg")
 
 # 6. Server Initialization
 if __name__ == '__main__':

@@ -23,7 +23,14 @@
             <p>Query the framework or analyze universal mechanics.</p>
             <textarea id="ai-input" rows="3" style="width: 100%; box-sizing: border-box; background: #2d2d2d; color: white; border: 1px solid #555; border-radius: 4px; padding: 10px; font-family: inherit;" placeholder="Initialize query..."></textarea>
             <button onclick="askAI()" style="margin-top: 10px; padding: 10px 15px; background: #00bcd4; color: #121212; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">Execute Query</button>
+            
             <div id="ai-response" style="margin-top: 15px; padding: 15px; background: #121212; border-left: 3px solid #00bcd4; display: none; line-height: 1.5;"></div>
+            
+            <!-- NEW: Hidden Audio Controls (Appears after AI responds) -->
+            <div id="audio-controls" style="display: none; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
+                <button id="listen-btn" onclick="playAudio()" style="padding: 8px 12px; background: #ff9800; color: #121212; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">🔊 Read Answer Aloud</button>
+                <audio id="tts-player" controls style="display: none; width: 100%; margin-top: 10px;"></audio>
+            </div>
         </div>
 
         <div class="module">
@@ -64,11 +71,20 @@
 
     <!-- AI COMMUNICATION SCRIPT -->
     <script>
+        // Global variable to hold the latest clean text for the voice engine
+        window.latestAiResponse = "";
+
         async function askAI() {
             const input = document.getElementById('ai-input').value;
             const responseDiv = document.getElementById('ai-response');
+            const audioControls = document.getElementById('audio-controls');
+            const player = document.getElementById('tts-player');
             
             if (!input) return;
+            
+            // Hide the audio controls and reset the interface while thinking
+            audioControls.style.display = 'none';
+            player.style.display = 'none';
             
             // Show loading state
             responseDiv.style.display = 'block';
@@ -89,12 +105,53 @@
                 } else {
                     // Format the text and display the AI's answer
                     responseDiv.innerHTML = data.response.replace(/\n/g, '<br>');
+                    
+                    // Save the raw text and reveal the audio controls
+                    window.latestAiResponse = data.response;
+                    document.getElementById('listen-btn').innerText = "🔊 Read Answer Aloud";
+                    audioControls.style.display = 'block';
                 }
             } catch (error) {
                 responseDiv.innerHTML = '<span style="color: #ff5252;">Connection failed. Verify server is running.</span>';
             }
         }
-    </script>
 
+        async function playAudio() {
+            const btn = document.getElementById('listen-btn');
+            const player = document.getElementById('tts-player');
+            
+            if (!window.latestAiResponse) return;
+            
+            btn.innerText = "⏳ Generating audio stream...";
+            btn.disabled = true;
+
+            try {
+                // Send the clean text to your Python Speechify route
+                const res = await fetch('/read_aloud', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: window.latestAiResponse })
+                });
+
+                if (!res.ok) throw new Error("Audio generation failed");
+
+                // Convert the raw data into a playable audio file
+                const blob = await res.blob();
+                player.src = URL.createObjectURL(blob);
+                player.style.display = "block";
+                
+                // Set playback speed to 25% faster for optimal efficiency
+                player.playbackRate = 1.25; 
+                await player.play();
+                
+                btn.innerText = "🔊 Playing Audio...";
+            } catch (error) {
+                console.error(error);
+                btn.innerText = "❌ Playback Error";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
 </body>
 </html>
