@@ -3,13 +3,16 @@ from flask import Flask, render_template, request, jsonify
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
-
+from speechify import Speechify
 # 1. Unlock the secure vault and load environment variables
 load_dotenv()
 
 # 2. Initialize the Modern Google GenAI Client
 client = genai.Client()
-
+# Initialize the Speechify client
+speechify_client = Speechify(
+    token=os.environ.get("SPEECHIFY_API_KEY")
+)
 # 3. Define the Infinite Box Theory System Persona
 ibt_instructions = """
 You are the Infinite Box Theory (IBT) Neural Assistant. 
@@ -41,6 +44,15 @@ ibt_cache = client.caches.create(
 print(f"Vault cached successfully! Ready for rapid queries.")
 # ---------------------------------------------------------
 
+
+def generate_audio(text_content):
+    response = speechify_client.audio.speech(
+        audio_format="mp3",
+        input=text_content,
+        model="simba-english",
+        voice_id="george"
+    )
+    return response
 @app.route('/')
 def home():
     return render_template('index.html')
