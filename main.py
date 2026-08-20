@@ -1,4 +1,5 @@
 import os
+import base64
 from flask import Flask, render_template, request, jsonify, Response
 from google import genai
 from google.genai import types
@@ -112,8 +113,11 @@ def read_aloud():
     # Generate the audio using Speechify
     audio_res = generate_audio(text_content)
     
-    # Stream the raw audio data directly back to the browser player
-    return Response(audio_res.audio_data, mimetype="audio/mpeg")
+    # Unwrap the Base64 text into raw, playable MP3 bytes
+    raw_audio_bytes = base64.b64decode(audio_res.audio_data)
+    
+    # Stream the raw audio directly back to the browser player
+    return Response(raw_audio_bytes, mimetype="audio/mpeg")
 
 # 6. Server Initialization
 if __name__ == '__main__':

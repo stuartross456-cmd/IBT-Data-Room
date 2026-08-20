@@ -125,8 +125,11 @@
             btn.innerText = "⏳ Processing audio chunks...";
             btn.disabled = true;
 
-            // 1. Safely chop the massive text into smaller pieces (by sentences)
-            const sentences = window.latestAiResponse.match(/[^.!?]+[.!?]+/g) || [window.latestAiResponse];
+            // 1. Scrub Markdown characters so the AI doesn't read them out loud
+            let cleanText = window.latestAiResponse.replace(/[*#_$]/g, '');
+
+            // 2. Safely chop the massive text into smaller pieces (by sentences)
+            const sentences = cleanText.match(/[^.!?]+[.!?]+/g) || [cleanText];
             let chunks = [];
             let currentChunk = "";
 
@@ -140,7 +143,7 @@
             }
             if (currentChunk) chunks.push(currentChunk);
 
-            // 2. Create the Playlist loop
+            // 3. Create the Playlist loop
             async function playNextChunk(index) {
                 if (index >= chunks.length) {
                     btn.innerText = "🔊 Read Answer Aloud";
@@ -166,7 +169,7 @@
                     // Maintain the crisp 1.25x speed for maximum efficiency
                     player.playbackRate = 1.25; 
 
-                    // 3. When this chunk finishes, automatically fetch and play the next one
+                    // 4. When this chunk finishes, automatically fetch and play the next one
                     player.onended = () => {
                         playNextChunk(index + 1);
                     };
