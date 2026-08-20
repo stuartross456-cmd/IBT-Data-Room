@@ -7,8 +7,19 @@
         .container { max-width: 800px; margin: auto; }
         h1 { border-bottom: 2px solid #555; padding-bottom: 10px; }
         .module { background-color: #1e1e1e; padding: 20px; margin-top: 20px; border-radius: 8px; }
-        a { color: #00bcd4; text-decoration: none; font-weight: bold; display: block; margin-top: 8px;}
-        a:hover { text-decoration: underline; color: #ffffff; }
+        
+        /* Link Row Styling */
+        .link-row { display: flex; align-items: center; margin-top: 8px; }
+        .link-row a { color: #00bcd4; text-decoration: none; font-weight: bold; margin-top: 0; }
+        .link-row a:hover { text-decoration: underline; color: #ffffff; }
+        .abstract-btn { background: none; border: none; color: #ffeb3b; cursor: pointer; font-weight: bold; font-size: 14px; margin-left: 10px; padding: 0; }
+        .abstract-btn:hover { text-decoration: underline; color: #ffffff; }
+
+        /* Modal (Pop-up) Styling */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
+        .modal-content { background-color: #1e1e1e; margin: 10% auto; padding: 20px; border: 1px solid #00bcd4; border-radius: 8px; width: 80%; max-width: 600px; position: relative; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5); }
+        .close-btn { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 20px; }
+        .close-btn:hover { color: #fff; }
     </style>
 </head>
 <body>
@@ -26,87 +37,94 @@
             
             <div id="ai-response" style="margin-top: 15px; padding: 15px; background: #121212; border-left: 3px solid #00bcd4; display: none; line-height: 1.5;"></div>
             
-            <!-- NEW: Hidden Audio Controls (Appears after AI responds) -->
             <div id="audio-controls" style="display: none; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-                <button id="listen-btn" onclick="playAudio()" style="padding: 8px 12px; background: #ff9800; color: #121212; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">🔊 Read Answer Aloud</button>
-                <audio id="tts-player" controls style="display: none; width: 100%; margin-top: 10px;"></audio>
+                <button id="listen-btn" onclick="playAudio('chat')" style="padding: 8px 12px; background: #ff9800; color: #121212; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">🔊 Read Answer Aloud</button>
+                <audio id="tts-player-chat" controls style="display: none; width: 100%; margin-top: 10px;"></audio>
             </div>
         </div>
 
         <div class="module">
             <h2>Applied Fluid Dynamics & Metric Expansion</h2>
             <p>Hydrodynamic Topography and structural fluid dynamics models.</p>
-            <a href="/static/IBT Chaos and Order.pdf" target="_blank">[ View: Chaos and Order ]</a>
-            <a href="/static/Hydrodynamic_Topography_Master_V5.pdf" target="_blank">[ View: Hydrodynamic Topography Master V5 ]</a>
-            <a href="/static/Hydrodynamic part 2.pdf" target="_blank">[ View: Hydrodynamic Part 2 ]</a>
-            <a href="/static/Hydrodynamic_Resolution_to_Quantum_NonLocality.pdf" target="_blank">[ View: Resolution to Quantum NonLocality ]</a>
+            <div class="link-row"><a href="/static/IBT Chaos and Order.pdf" target="_blank">[ View: Chaos and Order ]</a><button onclick="fetchAbstract('IBT Chaos and Order.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/Hydrodynamic_Topography_Master_V5.pdf" target="_blank">[ View: Hydrodynamic Topography Master V5 ]</a><button onclick="fetchAbstract('Hydrodynamic_Topography_Master_V5.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/Hydrodynamic part 2.pdf" target="_blank">[ View: Hydrodynamic Part 2 ]</a><button onclick="fetchAbstract('Hydrodynamic part 2.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/Hydrodynamic_Resolution_to_Quantum_NonLocality.pdf" target="_blank">[ View: Resolution to Quantum NonLocality ]</a><button onclick="fetchAbstract('Hydrodynamic_Resolution_to_Quantum_NonLocality.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
         </div>
 
         <div class="module">
             <h2>Theoretical Mathematics & Quantum Mechanics</h2>
             <p>Proofs by Modular Invariance, Substrate Mechanics, and Quantum Processing.</p>
-            <a href="/static/IBT and Riemann Hypothesis (1).pdf" target="_blank">[ View: Riemann Hypothesis Proof ]</a>
-            <a href="/static/IBT quantum processor.pdf" target="_blank">[ View: Quantum Processor ]</a>
-            <a href="/static/Proton_and_Quirks.pdf" target="_blank">[ View: Proton and Quirks ]</a>
-            <a href="/static/Acoustic_Cryptography_Quantum_Substrate.pdf" target="_blank">[ View: Acoustic Cryptography Substrate ]</a>
+            <div class="link-row"><a href="/static/IBT and Riemann Hypothesis (1).pdf" target="_blank">[ View: Riemann Hypothesis Proof ]</a><button onclick="fetchAbstract('IBT and Riemann Hypothesis (1).pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/IBT quantum processor.pdf" target="_blank">[ View: Quantum Processor ]</a><button onclick="fetchAbstract('IBT quantum processor.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/Proton_and_Quirks.pdf" target="_blank">[ View: Proton and Quirks ]</a><button onclick="fetchAbstract('Proton_and_Quirks.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/Acoustic_Cryptography_Quantum_Substrate.pdf" target="_blank">[ View: Acoustic Cryptography Substrate ]</a><button onclick="fetchAbstract('Acoustic_Cryptography_Quantum_Substrate.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
         </div>
 
         <div class="module">
             <h2>Philosophical & Codified Law</h2>
             <p>Analysis of consciousness, deterministic mechanics, and codified universal laws.</p>
-            <a href="/static/Physics_of_Free_Will_Full_Unabridged.pdf" target="_blank">[ View: Physics of Free Will ]</a>
-            <a href="/static/Codified_Law_I_Expanded.pdf" target="_blank">[ View: Codified Law I ]</a>
-            <a href="/static/law_ii.pdf" target="_blank">[ View: Law II ]</a>
+            <div class="link-row"><a href="/static/Physics_of_Free_Will_Full_Unabridged.pdf" target="_blank">[ View: Physics of Free Will ]</a><button onclick="fetchAbstract('Physics_of_Free_Will_Full_Unabridged.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/Codified_Law_I_Expanded.pdf" target="_blank">[ View: Codified Law I ]</a><button onclick="fetchAbstract('Codified_Law_I_Expanded.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/law_ii.pdf" target="_blank">[ View: Law II ]</a><button onclick="fetchAbstract('law_ii.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
         </div>
 
         <div class="module">
             <h2>Archived Frameworks & Data</h2>
             <p>Version history, assignments, and supplementary datasets.</p>
-            <a href="/static/IBT v13.pdf" target="_blank">[ View: IBT v13 ]</a>
-            <a href="/static/Assginment.pdf" target="_blank">[ View: Assignment ]</a>
-            <a href="/static/NED30.5.1-D-17.1.2-20200415.xlsx" target="_blank">[ Download: NED30.5.1 Data (.xlsx) ]</a>
+            <div class="link-row"><a href="/static/IBT v13.pdf" target="_blank">[ View: IBT v13 ]</a><button onclick="fetchAbstract('IBT v13.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/Assginment.pdf" target="_blank">[ View: Assignment ]</a><button onclick="fetchAbstract('Assginment.pdf')" class="abstract-btn">[ 💡 Abstract ]</button></div>
+            <div class="link-row"><a href="/static/NED30.5.1-D-17.1.2-20200415.xlsx" target="_blank">[ Download: NED30.5.1 Data (.xlsx) ]</a></div>
         </div>
 
     </div>
 
-    <!-- AI COMMUNICATION SCRIPT -->
-    <script>
-        // Global variable to hold the latest clean text for the voice engine
-        window.latestAiResponse = "";
+    <!-- ABSTRACT MODAL (Hidden by default) -->
+    <div id="abstractModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title" style="margin-top: 0; color: #00bcd4; font-size: 1.2em;">Document Abstract</h2>
+            <div id="modal-body" style="line-height: 1.5; font-size: 0.95em;">Loading abstract...</div>
+            
+            <div id="modal-audio-controls" style="display: none; margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
+                <button id="modal-listen-btn" onclick="playAudio('modal')" style="padding: 8px 12px; background: #ff9800; color: #121212; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">🔊 Read Abstract Aloud</button>
+                <audio id="tts-player-modal" controls style="display: none; width: 100%; margin-top: 10px;"></audio>
+            </div>
+        </div>
+    </div>
 
+    <!-- AI COMMUNICATION & AUDIO SCRIPT -->
+    <script>
+        // Global variables
+        window.latestAiResponse = "";
+        window.latestAbstractResponse = "";
+
+        // --- 1. CHAT FUNCTION ---
         async function askAI() {
             const input = document.getElementById('ai-input').value;
             const responseDiv = document.getElementById('ai-response');
             const audioControls = document.getElementById('audio-controls');
-            const player = document.getElementById('tts-player');
+            const player = document.getElementById('tts-player-chat');
             
             if (!input) return;
             
-            // Hide the audio controls and reset the interface while thinking
             audioControls.style.display = 'none';
             player.style.display = 'none';
-            
-            // Show loading state
             responseDiv.style.display = 'block';
             responseDiv.innerHTML = '<em style="color: #888;">Processing neural query...</em>';
             
             try {
-                // Send the data to your Python server
                 const response = await fetch('/ask_gemini', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ prompt: input })
                 });
-                
                 const data = await response.json();
                 
                 if (data.error) {
                     responseDiv.innerHTML = '<span style="color: #ff5252;">System Error: ' + data.error + '</span>';
                 } else {
-                    // Format the text and display the AI's answer
                     responseDiv.innerHTML = data.response.replace(/\n/g, '<br>');
-                    
-                    // Save the raw text and reveal the audio controls
                     window.latestAiResponse = data.response;
                     document.getElementById('listen-btn').innerText = "🔊 Read Answer Aloud";
                     audioControls.style.display = 'block';
@@ -116,19 +134,78 @@
             }
         }
 
-        async function playAudio() {
-            const btn = document.getElementById('listen-btn');
-            const player = document.getElementById('tts-player');
+        // --- 2. MODAL FUNCTIONS ---
+        async function fetchAbstract(filename) {
+            const modal = document.getElementById('abstractModal');
+            const modalBody = document.getElementById('modal-body');
+            const modalTitle = document.getElementById('modal-title');
+            const audioControls = document.getElementById('modal-audio-controls');
+            const player = document.getElementById('tts-player-modal');
             
-            if (!window.latestAiResponse) return;
+            // Reset modal state
+            modal.style.display = "block";
+            modalTitle.innerText = "Abstract: " + filename;
+            modalBody.innerHTML = '<em style="color: #888;">Generating structural overview...</em>';
+            audioControls.style.display = 'none';
+            player.style.display = 'none';
+            
+            try {
+                const response = await fetch('/get_abstract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename: filename })
+                });
+                const data = await response.json();
+                
+                if (data.error) {
+                    modalBody.innerHTML = '<span style="color: #ff5252;">System Error: ' + data.error + '</span>';
+                } else {
+                    modalBody.innerHTML = data.abstract.replace(/\n/g, '<br>');
+                    window.latestAbstractResponse = data.abstract;
+                    document.getElementById('modal-listen-btn').innerText = "🔊 Read Abstract Aloud";
+                    audioControls.style.display = 'block';
+                }
+            } catch (error) {
+                modalBody.innerHTML = '<span style="color: #ff5252;">Connection failed. Verify server is running.</span>';
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('abstractModal').style.display = "none";
+            const player = document.getElementById('tts-player-modal');
+            if(player) { player.pause(); player.src = ""; }
+        }
+
+        // Close modal if user clicks anywhere outside of the box
+        window.onclick = function(event) {
+            const modal = document.getElementById('abstractModal');
+            if (event.target == modal) { closeModal(); }
+        }
+
+        // --- 3. DUAL AUDIO PLAYER ENGINE ---
+        async function playAudio(source) {
+            let btn, player, rawText;
+            
+            // Route the engine to the correct pop-up or chat window
+            if (source === 'chat') {
+                btn = document.getElementById('listen-btn');
+                player = document.getElementById('tts-player-chat');
+                rawText = window.latestAiResponse;
+            } else if (source === 'modal') {
+                btn = document.getElementById('modal-listen-btn');
+                player = document.getElementById('tts-player-modal');
+                rawText = window.latestAbstractResponse;
+            }
+            
+            if (!rawText) return;
             
             btn.innerText = "⏳ Processing audio chunks...";
             btn.disabled = true;
 
-            // 1. Scrub Markdown characters so the AI doesn't read them out loud
-            let cleanText = window.latestAiResponse.replace(/[*#_$]/g, '');
+            // Scrub Markdown
+            let cleanText = rawText.replace(/[*#_$]/g, '');
 
-            // 2. Safely chop the massive text into smaller pieces (by sentences)
+            // Chunk by sentences safely
             const sentences = cleanText.match(/[^.!?]+[.!?]+/g) || [cleanText];
             let chunks = [];
             let currentChunk = "";
@@ -143,10 +220,10 @@
             }
             if (currentChunk) chunks.push(currentChunk);
 
-            // 3. Create the Playlist loop
+            // Playlist Loop
             async function playNextChunk(index) {
                 if (index >= chunks.length) {
-                    btn.innerText = "🔊 Read Answer Aloud";
+                    btn.innerText = source === 'modal' ? "🔊 Read Abstract Aloud" : "🔊 Read Answer Aloud";
                     btn.disabled = false;
                     return;
                 }
@@ -166,15 +243,11 @@
                     player.src = URL.createObjectURL(blob);
                     player.style.display = "block";
                     
-                    // Maintain the crisp 1.25x speed for maximum efficiency
                     player.playbackRate = 1.25; 
 
-                    // 4. When this chunk finishes, automatically fetch and play the next one
-                    player.onended = () => {
-                        playNextChunk(index + 1);
-                    };
-
+                    player.onended = () => { playNextChunk(index + 1); };
                     await player.play();
+                    
                 } catch (error) {
                     console.error(error);
                     btn.innerText = "❌ Playback Error";
@@ -182,7 +255,6 @@
                 }
             }
 
-            // Start the playlist at chunk 0
             playNextChunk(0);
         }
     </script>

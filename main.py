@@ -70,7 +70,7 @@ def ask_gemini():
         return jsonify({'error': 'No query provided'}), 400
         
     try:
-        # ATTEMPT 1: Query the pre-loaded cache directly (Lightning Fast)
+        # ATTEMPT 1: Query the pre-loaded cache directly
         response = client.models.generate_content(
             model='gemini-3.1-pro-preview',
             contents=user_prompt,
@@ -84,7 +84,6 @@ def ask_gemini():
     except Exception as e:
         # FALLBACK: If the cache drops, route to 3.5 Flash using the old raw-file method
         print(f"Primary Cache Failed: {e}. Rerouting to 3.5 Flash...")
-        
         try:
             query_package = vault_files + [user_prompt]
             fallback_response = client.models.generate_content(
@@ -100,7 +99,45 @@ def ask_gemini():
             return jsonify({'error': str(fallback_e)}), 500
 
 # ---------------------------------------------------------
-# NEW ROUTE: Text-to-Speech Audio Streamer
+# NEW ROUTE: Abstract Generator
+# ---------------------------------------------------------
+@app.route('/get_abstract', methods=['POST'])
+def get_abstract():
+    data = request.json
+    filename = data.get('filename')
+    
+    if not filename:
+        return jsonify({'error': 'No filename provided'}), 400
+        
+    prompt = f"Provide a concise, 1-2 paragraph abstract summarizing the contents of the document '{filename}'. Explain its core concepts specifically through the lens of the Infinite Box Theory."
+    
+    try:
+        response = client.models.generate_content(
+            model='gemini-3.1-pro-preview',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                cached_content=ibt_cache.name,
+                temperature=0.2
+            )
+        )
+        return jsonify({'abstract': response.text})
+    except Exception as e:
+        try:
+            query_package = vault_files + [prompt]
+            fallback_response = client.models.generate_content(
+                model='gemini-3.5-flash',
+                contents=query_package,
+                config=types.GenerateContentConfig(
+                    system_instruction=ibt_instructions,
+                    temperature=0.2
+                )
+            )
+            return jsonify({'abstract': fallback_response.text})
+        except Exception as fallback_e:
+            return jsonify({'error': str(fallback_e)}), 500
+
+# ---------------------------------------------------------
+# ROUTE: Text-to-Speech Audio Streamer
 # ---------------------------------------------------------
 @app.route('/read_aloud', methods=['POST'])
 def read_aloud():
